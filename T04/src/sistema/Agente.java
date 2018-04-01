@@ -62,15 +62,7 @@ public class Agente implements PontosCardeais {
     public int deliberar() {
         if(++ct == 0) {
             // Nao foi colocado nenhum check de falha, desnecessario por enquanto
-            if(algoritmo == 1) {
-                plan = planoCustoUniforme();
-            }
-            else if (algoritmo == 2) {
-                plan = planoAEuclidiano();
-            }
-            else if (algoritmo == 3) {
-                plan = planoAChebyshev();
-            }
+            gerarPlano();
         }
 
         int ap[];
@@ -127,7 +119,7 @@ public class Agente implements PontosCardeais {
     // Funcoes que fazem o pathfinding
     // Retornam os arrays com o caminho escolhido
 
-    public int[] planoCustoUniforme() {
+    private int[] gerarPlano() {
         TreeNode noInicial = new TreeNode(null);
         noInicial.setAction(-1);
         noInicial.setState(prob.estIni);
@@ -178,6 +170,7 @@ public class Agente implements PontosCardeais {
                     filho.setState(proxEstado);
                     filho.setAction(acao);
                     filho.setGn((float) (noAtual.getGn() + (acao % 2 == 0 ? 1 : 1.5))); // Adiciona custo 1 se for acao N S L O, senao 1.5
+                    filho.setHn(algoritmo == 1 ? custoUniforme(filho) : algoritmo == 2 ? AEuclidiano(filho) : AChebyshev(filho)); // Nem eu to feliz com isso
 
                     // Codigo burro
                     for(TreeNode no: fronteira) {
@@ -206,14 +199,16 @@ public class Agente implements PontosCardeais {
         }
     }
 
-    public static int[] planoAEuclidiano() {
+    private float custoUniforme(TreeNode) {
         //@todo
-        return(new int[] {N, N, N, NE, L, L, L, L, NE, NE, L}); // temporario
     }
 
-    public static int[] planoAChebyshev() {
+    private float AEuclidiano(TreeNode) {
         //@todo
-        return(new int[] {N, N, N, NE, L, L, L, L, NE, NE, L}); // temporario
+    }
+
+    private float AChebyshev(TreeNode) {
+        //@todo
     }
 }
     
