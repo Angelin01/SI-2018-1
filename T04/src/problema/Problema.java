@@ -92,7 +92,7 @@ public class Problema implements PontosCardeais {
                 break;
         }
         // verifica se está fora do grid
-        if (col < 0 || col >= crencaLabir.getMaxCol() || crencaLabir.getMaxLin() < 0 || lin >= crencaLabir.getMaxLin()) {
+        if (col < 0 || col >= crencaLabir.getMaxCol() || lin < 0 || lin >= crencaLabir.getMaxLin()) {
             lin = est.getLin();
             col = est.getCol();  // fica na posicao atual
         }
