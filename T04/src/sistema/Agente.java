@@ -63,7 +63,7 @@ public class Agente implements PontosCardeais {
     public int deliberar() {
         if(++ct == 0) {
             // Nao foi colocado nenhum check de falha, desnecessario por enquanto
-            gerarPlano();
+            plan = gerarPlano();
         }
 
         int ap[];
@@ -152,10 +152,22 @@ public class Agente implements PontosCardeais {
             noAtual = fronteira.remove(0);
 
             if(prob.testeObjetivo(noAtual.getState())) {
-            /** @todo
-             * Checar se achou solucao e retornar array bunitinho
-             */
-                return(new int[] {N, N, N, NE, L, L, L, L, NE, NE, L}); // temporario
+                List<Integer> solucao = new ArrayList<Integer>();
+                TreeNode reconstrutor = noAtual;
+                while(reconstrutor.getParent() != null) {
+                    solucao.add(reconstrutor.getAction());
+                    reconstrutor = reconstrutor.getParent();
+                }
+
+                int plan[] = solucao.stream().mapToInt(i->i).toArray();
+                int aux;
+                for(int i = 0; i < plan.length / 2; ++i) { // Plano eh adicionado ao contrario, inverter
+                    aux = plan[i];
+                    plan[i] = plan[plan.length - i - 1];
+                    plan[plan.length - i - 1] = aux;
+                }
+
+                return(plan); // NEM SEI MAIS, ver https://stackoverflow.com/a/23945015
             }
 
             explorados.add(noAtual);
@@ -200,16 +212,18 @@ public class Agente implements PontosCardeais {
         }
     }
 
-    private float custoUniforme(TreeNode) {
+    private float custoUniforme(TreeNode no) {
         return((float)0);
     }
 
-    private float AEuclidiano(TreeNode) {
+    private float AEuclidiano(TreeNode no ) {
         //@todo
+        return(0);
     }
 
-    private float AChebyshev(TreeNode) {
+    private float AChebyshev(TreeNode no) {
         //@todo
+        return(0);
     }
 }
     
