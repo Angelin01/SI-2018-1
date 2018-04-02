@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static comuns.PontosCardeais.*;
+import static java.lang.Math.abs;
+import static java.lang.Math.max;
+import static java.lang.Math.sqrt;
 
 /**
  *
@@ -218,12 +221,18 @@ public class Agente implements PontosCardeais {
 
     private float AEuclidiano(TreeNode no ) {
         //@todo
-        return(0);
+        return((float)sqrt(
+                (prob.estObj.getLin() - no.getState().getLin()) * (prob.estObj.getLin() - no.getState().getLin()) +
+                (prob.estObj.getCol() - no.getState().getCol()) * (prob.estObj.getCol() - no.getState().getCol())
+        ));
     }
 
     private float AChebyshev(TreeNode no) {
         //@todo
-        return(0);
+        return((float)max(
+                abs(prob.estObj.getLin() - no.getState().getLin()),
+                abs(prob.estObj.getCol() - no.getState().getCol())
+        ));
     }
 }
     
