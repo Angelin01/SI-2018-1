@@ -127,6 +127,7 @@ public class Agente implements PontosCardeais {
         noInicial.setAction(-1);
         noInicial.setState(prob.estIni);
         noInicial.setGn(0);
+        noInicial.setHn(algoritmo == 1 ? custoUniforme(noInicial) : algoritmo == 2 ? AEuclidiano(noInicial) : AChebyshev(noInicial)); // Nem eu to feliz com isso
 
         // Usando listas em vez de arrays pq eh mais apropriado
         List<TreeNode> fronteira = new ArrayList<TreeNode>();
@@ -200,7 +201,7 @@ public class Agente implements PontosCardeais {
     }
 
     private float custoUniforme(TreeNode) {
-        return(0);
+        return((float)0);
     }
 
     private float AEuclidiano(TreeNode) {
