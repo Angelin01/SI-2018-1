@@ -5,6 +5,8 @@ package arvore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+
 import problema.Estado;
 
 /**
@@ -96,6 +98,20 @@ public class TreeNode {
     public void setGnHn(float gn, float hn) {
         this.gn = gn;
         this.hn = hn;
+    }
+
+    // Retorna o objeto, se ele estiver na fila de prioridades. Em caso contrário, retorna null.
+    public TreeNode contidoEm(Queue<TreeNode> pq) {
+        TreeNode found = null;
+
+        for (TreeNode node : pq) {
+            if (this.getState().igualAo(node.getState())) {
+                found = node;
+                break;
+            }
+        }
+
+        return found;
     }
 
     private static void printSubTreeRec(TreeNode node, int nivel) {

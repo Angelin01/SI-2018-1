@@ -124,8 +124,7 @@ public class Agente implements PontosCardeais {
     // Retornam os arrays com o caminho escolhido
 
     private int[] gerarPlano() {
-        fnComparator comparador = new fnComparator();
-
+        // Cria a raiz da árvore
         TreeNode noInicial = new TreeNode(null);
         noInicial.setAction(-1);
         noInicial.setState(prob.estIni);
@@ -133,28 +132,27 @@ public class Agente implements PontosCardeais {
         noInicial.setHn(algoritmo == 1 ? custoUniforme(noInicial) : algoritmo == 2 ? AEuclidiano(noInicial) : AChebyshev(noInicial)); // Nem eu to feliz com isso
 
         // Usando listas/queues em vez de arrays pq eh mais apropriado
-        Queue<TreeNode> fronteira = new PriorityQueue<>(comparador);
+        Queue<TreeNode> fronteira = new PriorityQueue<TreeNode>(new fnComparator());
+        List<Estado> explorados = new ArrayList<Estado>();
+
         fronteira.add(noInicial);
 
-        List<TreeNode> explorados = new ArrayList<TreeNode>();
-
         TreeNode noAtual;
-        Estado proxEstado;
+        Estado estadoAtual;
 
-        // Codigo Burro
-        boolean inFronteira;
-        boolean inExplorados;
-        //int indexGNMaior;
-        TreeNode noARemover;
-
-        while(true) {
+        while (true) {
             if (fronteira.size() == 0) {
-                return (null); // Falhou a procura
+                return null; // Falhou a procura
             }
 
+            // Retira o elemento de menor f(n)
             noAtual = fronteira.poll();
+            estadoAtual = noAtual.getState();
 
-            if(prob.testeObjetivo(noAtual.getState())) {
+            System.out.println("Expl. (" + estadoAtual.getLin() + ", " + estadoAtual.getCol() + "), f(n)=" + noAtual.getFn());
+
+            // Testa se chegou ao objetivo. Se sim, monta o vetor solução e retorna.
+            if(prob.testeObjetivo(estadoAtual)) {
                 int[] plan = new int[noAtual.getDepth()];
 
                 TreeNode nodeIterator = noAtual;
@@ -163,45 +161,35 @@ public class Agente implements PontosCardeais {
                     nodeIterator = nodeIterator.getParent();
                 }
 
-                return(plan);
+                return plan;
             }
 
-            explorados.add(noAtual);
-            for(int acao = 0; acao < 8; ++acao) { // Para cada possivel acao...
-                // Codigo burro
-                inFronteira = false;
-                inExplorados = false;
-                noARemover = null;
+            explorados.add(estadoAtual);
 
-                proxEstado = prob.suc(noAtual.getState(), acao);
-                if(!proxEstado.igualAo(noAtual.getState())) { // Apenas adicionar se eh uma movimentacao valida
+            int[] acoes = prob.acoesPossiveis(estadoAtual);
+            for (int acao = 0; acao < 8; ++acao) {
+                if (acoes[acao] != -1) { // Para cada possivel acao...
+                    // Cria um nó na árvore
                     TreeNode filho = noAtual.addChild();
-                    filho.setState(proxEstado);
+                    filho.setState(prob.suc(estadoAtual, acao));
                     filho.setAction(acao);
-                    filho.setGn((float) (noAtual.getGn() + (acao % 2 == 0 ? 1 : 1.5))); // Adiciona custo 1 se for acao N S L O, senao 1.5
+                    filho.setGn((noAtual.getGn() + (acao % 2 == 0 ? 1.0f : 1.5f))); // Adiciona custo 1 se for acao N S L O, senao 1.5
                     filho.setHn(algoritmo == 1 ? custoUniforme(filho) : algoritmo == 2 ? AEuclidiano(filho) : AChebyshev(filho)); // Nem eu to feliz com isso
 
-                    // Codigo burro
-                    for(TreeNode no: fronteira) {
-                        if(filho.getState().igualAo(no.getState())) {
-                            inFronteira = true;
-                            if(filho.getGn() < no.getGn()) {
-                                noARemover = no;
+                    TreeNode noAntigo;
+                    if (!filho.getState().contidoEm(explorados)) {
+                        noAntigo = filho.contidoEm(fronteira);
+                        if (noAntigo == null) {
+                            // Se o estado não foi explorado, e o nó não está na fronteira, adiciona-o à fronteira.
+                            fronteira.add(filho);
+                        }
+                        else {
+                            // Se o estado não foi explorado, e o nó já está na fronteira, compara os custos.
+                            if (noAntigo.getFn() > filho.getFn()) {
+                                fronteira.add(filho);
+                                fronteira.remove(noAntigo);
                             }
                         }
-                    }
-                    for(TreeNode no: explorados) {
-                        if(filho.getState().igualAo(no.getState())) {
-                            inExplorados = true;
-                        }
-                    }
-
-                    if(!inFronteira && !inExplorados) {
-                        fronteira.add(filho);
-                    }
-                    else if(inFronteira && noARemover != null) {
-                        fronteira.add(filho);
-                        fronteira.remove(noARemover);
                     }
                 }
             }
@@ -209,23 +197,21 @@ public class Agente implements PontosCardeais {
     }
 
     private float custoUniforme(TreeNode no) {
-        return((float)0);
+        return 0.0f;
     }
 
     private float AEuclidiano(TreeNode no ) {
-        //@todo
-        return((float)sqrt(
+        return (float) sqrt(
                 (prob.estObj.getLin() - no.getState().getLin()) * (prob.estObj.getLin() - no.getState().getLin()) +
                 (prob.estObj.getCol() - no.getState().getCol()) * (prob.estObj.getCol() - no.getState().getCol())
-        ));
+        );
     }
 
     private float AChebyshev(TreeNode no) {
-        //@todo
-        return((float)max(
+        return (float) max(
                 abs(prob.estObj.getLin() - no.getState().getLin()),
                 abs(prob.estObj.getCol() - no.getState().getCol())
-        ));
+        );
     }
 
 }

@@ -5,6 +5,8 @@
  */
 package problema;
 
+import java.util.List;
+
 public class Estado {
     /** linha onde se encontra o agente */
     private int lin;
@@ -23,6 +25,20 @@ public class Estado {
     
     public boolean igualAo(Estado a) {
         return this.lin == a.lin && this.col == a.col;
+    }
+
+    // Retorna true se o estado estiver na lista. Em caso contrário, retorna false.
+    public boolean contidoEm(List<Estado> al) {
+        boolean contido = false;
+
+        for (Estado e : al) {
+            if (this.igualAo(e)) {
+                contido = true;
+                break;
+            }
+        }
+
+        return contido;
     }
 
     public int getLin() {
