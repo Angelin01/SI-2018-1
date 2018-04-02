@@ -6,6 +6,7 @@ import problema.Problema;
 import comuns.Labirinto;
 import comuns.PontosCardeais;
 import arvore.TreeNode;
+import arvore.fnComparator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,6 +121,8 @@ public class Agente implements PontosCardeais {
     // Retornam os arrays com o caminho escolhido
 
     private int[] gerarPlano() {
+        fnComparator comparador = new fnComparator();
+
         TreeNode noInicial = new TreeNode(null);
         noInicial.setAction(-1);
         noInicial.setState(prob.estIni);
@@ -144,11 +147,8 @@ public class Agente implements PontosCardeais {
                 return (null); // Falhou a procura
             }
 
+            fronteira.sort(comparador);
             noAtual = fronteira.remove(0);
-            /** @todo
-             *  Dar sort na fronteira para que o no de menor custo fique em primeiro
-             *  Ou sempre pegar o no de menor custo em vez de dar sort
-             */
 
             if(prob.testeObjetivo(noAtual.getState())) {
             /** @todo
@@ -200,7 +200,7 @@ public class Agente implements PontosCardeais {
     }
 
     private float custoUniforme(TreeNode) {
-        //@todo
+        return(0);
     }
 
     private float AEuclidiano(TreeNode) {
