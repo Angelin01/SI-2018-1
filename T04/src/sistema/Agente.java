@@ -3,15 +3,15 @@ package sistema;
 import ambiente.Model;
 import problema.Estado;
 import problema.Problema;
-import comuns.Labirinto;
 import comuns.PontosCardeais;
 import arvore.TreeNode;
 import arvore.fnComparator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
-import static comuns.PontosCardeais.*;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.sqrt;
@@ -132,8 +132,8 @@ public class Agente implements PontosCardeais {
         noInicial.setGn(0);
         noInicial.setHn(algoritmo == 1 ? custoUniforme(noInicial) : algoritmo == 2 ? AEuclidiano(noInicial) : AChebyshev(noInicial)); // Nem eu to feliz com isso
 
-        // Usando listas em vez de arrays pq eh mais apropriado
-        List<TreeNode> fronteira = new ArrayList<TreeNode>();
+        // Usando listas/queues em vez de arrays pq eh mais apropriado
+        Queue<TreeNode> fronteira = new PriorityQueue<>(comparador);
         fronteira.add(noInicial);
 
         List<TreeNode> explorados = new ArrayList<TreeNode>();
@@ -144,33 +144,26 @@ public class Agente implements PontosCardeais {
         // Codigo Burro
         boolean inFronteira;
         boolean inExplorados;
-        int indexGNMaior;
+        //int indexGNMaior;
+        TreeNode noARemover;
 
         while(true) {
             if (fronteira.size() == 0) {
                 return (null); // Falhou a procura
             }
 
-            fronteira.sort(comparador);
-            noAtual = fronteira.remove(0);
+            noAtual = fronteira.poll();
 
             if(prob.testeObjetivo(noAtual.getState())) {
-                List<Integer> solucao = new ArrayList<Integer>();
-                TreeNode reconstrutor = noAtual;
-                while(reconstrutor.getParent() != null) {
-                    solucao.add(reconstrutor.getAction());
-                    reconstrutor = reconstrutor.getParent();
+                int[] plan = new int[noAtual.getDepth()];
+
+                TreeNode nodeIterator = noAtual;
+                for (int i = noAtual.getDepth() - 1; i >= 0; --i) {
+                    plan[i] = nodeIterator.getAction();
+                    nodeIterator = nodeIterator.getParent();
                 }
 
-                int plan[] = solucao.stream().mapToInt(i->i).toArray();
-                int aux;
-                for(int i = 0; i < plan.length / 2; ++i) { // Plano eh adicionado ao contrario, inverter
-                    aux = plan[i];
-                    plan[i] = plan[plan.length - i - 1];
-                    plan[plan.length - i - 1] = aux;
-                }
-
-                return(plan); // NEM SEI MAIS, ver https://stackoverflow.com/a/23945015
+                return(plan);
             }
 
             explorados.add(noAtual);
@@ -178,11 +171,11 @@ public class Agente implements PontosCardeais {
                 // Codigo burro
                 inFronteira = false;
                 inExplorados = false;
-                indexGNMaior = -1;
+                noARemover = null;
 
                 proxEstado = prob.suc(noAtual.getState(), acao);
                 if(!proxEstado.igualAo(noAtual.getState())) { // Apenas adicionar se eh uma movimentacao valida
-                    TreeNode filho = new TreeNode(noAtual);
+                    TreeNode filho = noAtual.addChild();
                     filho.setState(proxEstado);
                     filho.setAction(acao);
                     filho.setGn((float) (noAtual.getGn() + (acao % 2 == 0 ? 1 : 1.5))); // Adiciona custo 1 se for acao N S L O, senao 1.5
@@ -193,7 +186,7 @@ public class Agente implements PontosCardeais {
                         if(filho.getState().igualAo(no.getState())) {
                             inFronteira = true;
                             if(filho.getGn() < no.getGn()) {
-                                indexGNMaior = fronteira.indexOf(no);
+                                noARemover = no;
                             }
                         }
                     }
@@ -206,9 +199,9 @@ public class Agente implements PontosCardeais {
                     if(!inFronteira && !inExplorados) {
                         fronteira.add(filho);
                     }
-                    else if(inFronteira && indexGNMaior >= 0) {
+                    else if(inFronteira && noARemover != null) {
                         fronteira.add(filho);
-                        fronteira.remove(indexGNMaior);
+                        fronteira.remove(noARemover);
                     }
                 }
             }
@@ -234,6 +227,5 @@ public class Agente implements PontosCardeais {
                 abs(prob.estObj.getCol() - no.getState().getCol())
         ));
     }
-}
-    
 
+}
