@@ -16,17 +16,17 @@ public class Labirinto {
     /*Número máximo de linhas do labirinto */
     private final int maxLin;     
     
-    public Labirinto(int maxColunas, int maxLinhas) {
-        maxCol = maxColunas;
+    public Labirinto(int maxLinhas, int maxColunas) {
         maxLin = maxLinhas;
-        parede = new int[maxCol][maxLin];
+        maxCol = maxColunas;
+        parede = new int[maxLin][maxCol];
     }
     
     public int getMaxLin() {
         return this.maxLin;
     }
     public int getMaxCol() {
-        return this.maxLin;
+        return this.maxCol;
     }
     
    /** Constroi parede horizontal da coluna inicial até a final na linha indicada.
