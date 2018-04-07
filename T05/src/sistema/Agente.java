@@ -86,9 +86,9 @@ public class Agente implements PontosCardeais {
         // Imprime o estado do mundo
         System.out.println("=============\n" +
                 "CT = " + ct + "\n");
-        //model.desenhar();
+        model.desenhar();
 
-        printHeur();
+        //printHeur();
 
         if (!prob.testeObjetivo(estAtu)) {
             float menorF = 0;
