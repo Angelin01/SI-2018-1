@@ -20,6 +20,7 @@ public class Agente implements PontosCardeais {
     Model model;
     Problema prob;
     Estado estAtu; // guarda o estado atual (posição atual do agente)
+    String solucao;
 
     private double custo;
 
@@ -73,6 +74,7 @@ public class Agente implements PontosCardeais {
             }
         }
 
+        solucao = "";
         custoOtimo = determinarCustoOtimo();
     }
     
@@ -147,6 +149,7 @@ public class Agente implements PontosCardeais {
             System.out.println("\nProxima acao (escolhida): " + acao[acaoAFazer] + "\n");
 
             custo += (acaoAFazer % 2 == 0) ? 1.0f : 1.5f;
+            solucao += " " + acao[acaoAFazer];
             executarIr(acaoAFazer);
 
             // atualiza estado atual - sabendo que o ambiente eh deterministico
@@ -155,7 +158,11 @@ public class Agente implements PontosCardeais {
         else {
             System.out.println("Fim.");
             System.out.println("Estado atual: (" + estAtu.getLin() + "," + estAtu.getCol() + ")");
-            System.out.println("Custo: " + custo);
+            System.out.println("Custo final: " + custo);
+            System.out.println("Razao de competitividade: " + custo + "/" + Double.toString(custoOtimo) + " = " + custo/custoOtimo);
+            if(custo == custoOtimo) {
+                System.out.println("!!! Solucao otima encontrada !!!: " + solucao);
+            }
             return -1;
         }
 
@@ -296,6 +303,7 @@ public class Agente implements PontosCardeais {
         custo = 0;
         ct = -1;
         estAtu = prob.estIni;
+        solucao = "";
     }
 
     public void printHeur() {

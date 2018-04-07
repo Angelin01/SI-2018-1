@@ -64,8 +64,6 @@ public class Main {
 
             while (ag.deliberar() != -1); // O agente imprime o estado do mundo, conforme solicitado no enunciado do T04.
 
-            System.out.println("\nCusto final: " + ag.getCusto() +
-                               "\nRazao de competitividade: " + ag.getCusto() + "/11.5" + " = " + ag.getCusto()/11.5f);
             System.out.println("\n\n========================\nIteração " + ++itCounter + " Completa\n========================\n" +
                                "Digite 'q' para terminar ou qualquer outra coisa para continuar");
             input = in.next(); // Java eh um lixo
