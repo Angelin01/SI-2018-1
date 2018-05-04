@@ -53,9 +53,13 @@ public class KnapsackMain {
             problem = new KnapsackProblem(knapsackCapacity, value, weight, true, logGeracoes);
         }
 
-
+        KnapsackChromosome bestSolution = null;
         for (int execCount = 0; execCount < 1000; execCount++) {
             KnapsackChromosome solution = problem.solve();
+
+            if(bestSolution == null || bestSolution.fitness < solution.fitness) {
+                bestSolution = solution;
+            }
 
             int itemCount = 0;
 
@@ -89,6 +93,8 @@ public class KnapsackMain {
                 }
             }*/
         }
+
+        bestSolution.printTable();
 
         logExecucoes.closeFile();
         logGeracoes.closeFile();

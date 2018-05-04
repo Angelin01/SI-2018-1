@@ -49,4 +49,25 @@ public class KnapsackChromosome {
         }
         System.out.println(" (f: " + fitness + ")");
     }
+
+    public void printTable() {
+        int itemCount = 0, totalWeight = 0;
+        System.out.println("-----------------------");
+        System.out.println(" Mochila | Peso | Valor\n" +
+                           "---------+------+------");
+
+        for (int i = 0; i < isInKnapsack.length; ++i) {
+            if (isInKnapsack[i]) {
+                ++itemCount;
+                totalWeight += problem.itemSet[i].weight;
+                System.out.println(String.format("item [%2d]|%6d|%5d", i+1, problem.itemSet[i].weight, problem.itemSet[i].value));
+            }
+        }
+
+        System.out.println("-----------------------");
+        System.out.println(String.format("Mochila com %3d ITENS", itemCount));
+        System.out.println(String.format("Mochila com %3d KG", totalWeight));
+        System.out.println(String.format("Mochila com %3d VALOR", fitness));
+        System.out.println("-----------------------");
+    }
 }
