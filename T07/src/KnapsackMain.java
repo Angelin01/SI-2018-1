@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class KnapsackMain {
     // Valores dos itens do problema
     private static final int[] value = {
@@ -28,8 +30,29 @@ public class KnapsackMain {
         logExecucoes = new ArquivoTexto("log_execucoes.csv");
         logGeracoes  = new ArquivoTexto("log_geracoes.csv");
 
+        Scanner in = new Scanner(System.in);
+        int metodo = 0;
+
+        while(metodo != 1 && metodo != 2) {
+            System.out.println("Escolha um método:\n" +
+                    "1 - Reparar\n" +
+                    "2 - Penalizar");
+            metodo = in.nextInt();
+        }
+
+        KnapsackProblem problem;
         // Cria a instância do problema
-        KnapsackProblem problem = new KnapsackProblem(knapsackCapacity, value, weight, logGeracoes);
+        if (metodo == 1) {
+            problem = new KnapsackProblem(knapsackCapacity, value, weight, true, logGeracoes);
+        }
+        else if (metodo == 2) {
+            problem = new KnapsackProblem(knapsackCapacity, value, weight, false, logGeracoes);
+        }
+        else {
+            System.out.println("Método inválido identificado. Selecionado \"Reparar\"");
+            problem = new KnapsackProblem(knapsackCapacity, value, weight, true, logGeracoes);
+        }
+
 
         for (int execCount = 0; execCount < 1000; execCount++) {
             KnapsackChromosome solution = problem.solve();

@@ -8,7 +8,7 @@ public class KnapsackProblem {
     private static final double CROSSOVER_PROB = 0.8;
     private static final double MUTATION_PROB = 0.05;
 
-    public boolean repairWhenInvalid = true; // true para reparar, false para penalizar
+    public boolean repairWhenInvalid; // true para reparar, false para penalizar
 
     public KnapsackItem[] itemSet;
     public int capacity;
@@ -17,11 +17,12 @@ public class KnapsackProblem {
 
     private ArquivoTexto log;
 
-    public KnapsackProblem(int capacity, int[] value, int[] weight, ArquivoTexto file) {
+    public KnapsackProblem(int capacity, int[] value, int[] weight, boolean repairWhenInvalid, ArquivoTexto file) {
         if (value.length == weight.length) {
             itemSet = new KnapsackItem[value.length];
             this.capacity = capacity;
             this.log = file;
+            this.repairWhenInvalid = repairWhenInvalid;
 
             for (int i = 0; i < itemSet.length; ++i) {
                 itemSet[i] = new KnapsackItem(value[i], weight[i]);

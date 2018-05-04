@@ -19,12 +19,6 @@ public class KnapsackChromosome {
         this.fitness = chromo.fitness;
     }
 
-    public void randomize() {
-        for (int i = 0; i < isInKnapsack.length; ++i) {
-            isInKnapsack[i] = problem.rng.nextBoolean();
-        }
-    }
-
     // Função bem "burra" de penalização
     public void applyPenalty() {
         this.fitness /= 6;

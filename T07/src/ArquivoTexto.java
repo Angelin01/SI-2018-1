@@ -9,7 +9,7 @@ public class ArquivoTexto {
 
     private static final String COMMA_DELIMITER = ",";
     private static final String NEW_LINE_SEPARATOR = "\n";
-    public String fileName = "C:/arq.txt";
+    public String fileName = "./arq.txt";
     private FileWriter fileWriter;
 
     public ArquivoTexto(String name) {
