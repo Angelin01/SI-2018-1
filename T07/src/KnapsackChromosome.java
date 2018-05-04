@@ -60,7 +60,7 @@ public class KnapsackChromosome {
             if (isInKnapsack[i]) {
                 ++itemCount;
                 totalWeight += problem.itemSet[i].weight;
-                System.out.println(String.format("item [%2d]|%6d|%5d", i+1, problem.itemSet[i].weight, problem.itemSet[i].value));
+                System.out.println(String.format("item [%02d]|%6d|%5d", i+1, problem.itemSet[i].weight, problem.itemSet[i].value));
             }
         }
 
