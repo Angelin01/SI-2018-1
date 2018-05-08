@@ -54,7 +54,7 @@ public class KnapsackMain {
         }
 
         KnapsackChromosome bestSolution = null;
-        for (int execCount = 0; execCount < 1000; execCount++) {
+        for (int execCount = 0; execCount < executions; execCount++) {
             KnapsackChromosome solution = problem.solve();
 
             if(bestSolution == null || bestSolution.fitness < solution.fitness) {

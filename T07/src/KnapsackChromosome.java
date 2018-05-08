@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class KnapsackChromosome {
     protected KnapsackProblem problem;
 
@@ -5,10 +7,13 @@ public class KnapsackChromosome {
 
     public int fitness;
 
-    public KnapsackChromosome(KnapsackProblem problem) {
+    private Random rng;
+
+    public KnapsackChromosome(KnapsackProblem problem, Random rng) {
         this.problem = problem;
         this.isInKnapsack = new boolean[problem.itemSet.length];
         this.fitness = -1;
+        this.rng = rng;
     }
 
     // Copia um cromossomo
@@ -17,6 +22,7 @@ public class KnapsackChromosome {
         this.isInKnapsack = new boolean[this.problem.itemSet.length];
         System.arraycopy(chromo.isInKnapsack, 0, this.isInKnapsack, 0, this.isInKnapsack.length);
         this.fitness = chromo.fitness;
+        this.rng = chromo.rng;
     }
 
     // Função bem "burra" de penalização
@@ -69,5 +75,11 @@ public class KnapsackChromosome {
         System.out.println(String.format("Mochila com %3d KG", totalWeight));
         System.out.println(String.format("Mochila com %3d VALOR", fitness));
         System.out.println("-----------------------");
+    }
+
+    public void randomize() {
+        for (int i = 0; i < isInKnapsack.length; ++i) {
+            isInKnapsack[i] = (rng.nextDouble() < 0.2);
+        }
     }
 }

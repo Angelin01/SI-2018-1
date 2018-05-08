@@ -1,9 +1,9 @@
 import java.util.*;
 
 public class KnapsackProblem {
-    private static final int MAX_GENERATIONS = 500;
-    private static final int POPULATION_SIZE = 8;
-    private static final int REPRODUCTION_SIZE = 8;
+    private static final int MAX_GENERATIONS = 1000;
+    private static final int POPULATION_SIZE = 64;
+    private static final int REPRODUCTION_SIZE = 64;
 
     private static final double CROSSOVER_PROB = 0.8;
     private static final double MUTATION_PROB = 0.05;
@@ -40,9 +40,18 @@ public class KnapsackProblem {
         // Gera população inicial
         List<KnapsackChromosome> population = new ArrayList<>(POPULATION_SIZE);
         for (int i = 0; i < POPULATION_SIZE; i++) {
-            KnapsackChromosome chromo = new KnapsackChromosome(this);
-            //chromo.randomize();
+            KnapsackChromosome chromo = new KnapsackChromosome(this, rng);
+            chromo.randomize();
             chromo.fitness = getFitness(chromo);
+
+            int chromoWeight = getTotalWeight(chromo);
+            if (chromoWeight > capacity) {
+                if (repairWhenInvalid) {
+                    chromo.repair(chromoWeight, capacity);
+                } else {
+                    chromo.applyPenalty();
+                }
+            }
 
             //chromo.print();
 
@@ -134,9 +143,13 @@ public class KnapsackProblem {
                 int chromoWeight = getTotalWeight(chromo);
                 if (chromoWeight > capacity) {
                     if (repairWhenInvalid) {
+                        //System.out.println("Infactível: f: " + chromo.fitness + ", w: " + chromoWeight);
                         chromo.repair(chromoWeight, capacity);
+                        //System.out.println("Reparado: f: " + chromo.fitness + ", w: " + getTotalWeight(chromo));
                     } else {
+                        //System.out.println("Infactível: f: " + chromo.fitness + ", w: " + chromoWeight);
                         chromo.applyPenalty();
+                        //System.out.println("Penalizado: f: " + chromo.fitness + ", w: " + getTotalWeight(chromo));
                     }
                 }
             }
