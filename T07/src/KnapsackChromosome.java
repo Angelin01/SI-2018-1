@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class KnapsackChromosome {
@@ -32,15 +34,23 @@ public class KnapsackChromosome {
 
     // Função bem "burra" de reparo
     public void repair(int presentWeight, int capacity) {
-        for (int i = 0; i < isInKnapsack.length; i++) {
+        List<Integer> itemList = new ArrayList<>();
+
+        for (int i = 0; i < isInKnapsack.length; ++i) {
             if (isInKnapsack[i]) {
-                isInKnapsack[i] = false;
-                fitness -= problem.itemSet[i].value;
-                presentWeight -= problem.itemSet[i].weight;
-                if (presentWeight <= capacity) {
-                    return;
-                }
+                itemList.add(i);
             }
+        }
+
+        while (presentWeight > capacity) {
+            int randomItemIndex = rng.nextInt(itemList.size());
+            int item = itemList.get(randomItemIndex);
+
+            isInKnapsack[item] = false;
+            fitness -= problem.itemSet[item].value;
+            presentWeight -= problem.itemSet[item].weight;
+
+            itemList.remove(randomItemIndex);
         }
     }
 
