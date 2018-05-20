@@ -356,7 +356,7 @@ public class Agente implements PontosCardeais {
 
     private int energia(char[] cor) {
         // Check de entrada de tamanho inválido
-        if (cor.length != 6) {
+        if (cor.length != 5) {
             return -1;
         }
 
