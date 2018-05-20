@@ -1,0 +1,93 @@
+=== Run information ===
+
+Scheme:       weka.classifiers.trees.Id3 
+Relation:     energia-frutas
+Instances:    900
+Attributes:   6
+              cor0
+              cor1
+              cor2
+              cor3
+              cor4
+              energia
+Test mode:    evaluate on training data
+
+=== Classifier model (full training set) ===
+
+Id3
+
+
+cor1 = R
+|  cor3 = R
+|  |  cor2 = R: 4
+|  |  cor2 = G: 2
+|  |  cor2 = B: 2
+|  cor3 = G
+|  |  cor2 = R: 2
+|  |  cor2 = G: 2
+|  |  cor2 = B: 0
+|  cor3 = B
+|  |  cor2 = R: 2
+|  |  cor2 = G: 4
+|  |  cor2 = B: 2
+cor1 = G
+|  cor0 = K
+|  |  cor3 = R
+|  |  |  cor2 = R: 2
+|  |  |  cor2 = G: 2
+|  |  |  cor2 = B: 0
+|  |  cor3 = G
+|  |  |  cor2 = R: 2
+|  |  |  cor2 = G: 4
+|  |  |  cor2 = B: 2
+|  |  cor3 = B
+|  |  |  cor2 = R: 0
+|  |  |  cor2 = G: 2
+|  |  |  cor2 = B: 2
+|  cor0 = W: 0
+cor1 = B
+|  cor2 = R
+|  |  cor3 = R: 2
+|  |  cor3 = G: 0
+|  |  cor3 = B: 2
+|  cor2 = G
+|  |  cor3 = R: 0
+|  |  cor3 = G: 2
+|  |  cor3 = B: 2
+|  cor2 = B
+|  |  cor3 = R: 2
+|  |  cor3 = G: 2
+|  |  cor3 = B: 4
+
+Time taken to build model: 0.01 seconds
+
+=== Evaluation on training set ===
+
+Time taken to test model on training data: 0 seconds
+
+=== Summary ===
+
+Correctly Classified Instances         900              100      %
+Incorrectly Classified Instances         0                0      %
+Kappa statistic                          1     
+Mean absolute error                      0     
+Root mean squared error                  0     
+Relative absolute error                  0      %
+Root relative squared error              0      %
+Total Number of Instances              900     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1,000    0,000    1,000      1,000    1,000      1,000    1,000     1,000     0
+                 1,000    0,000    1,000      1,000    1,000      1,000    1,000     1,000     2
+                 1,000    0,000    1,000      1,000    1,000      1,000    1,000     1,000     4
+Weighted Avg.    1,000    0,000    1,000      1,000    1,000      1,000    1,000     1,000     
+
+=== Confusion Matrix ===
+
+   a   b   c   <-- classified as
+ 276   0   0 |   a = 0
+   0 512   0 |   b = 2
+   0   0 112 |   c = 4
+
