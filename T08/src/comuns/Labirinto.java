@@ -14,12 +14,17 @@ public class Labirinto {
     /*Número máximo de colunas do labirinto */
     private final int maxCol;      
     /*Número máximo de linhas do labirinto */
-    private final int maxLin;     
+    private final int maxLin;
+
+    public Fruta frutas[][];
     
     public Labirinto(int maxLinhas, int maxColunas) {
         maxLin = maxLinhas;
         maxCol = maxColunas;
         parede = new int[maxLin][maxCol];
+        frutas = new Fruta[maxLin][maxCol];
+
+        for (int i = 0; i < maxLin; ++i) for (int j = 0; j < maxCol; ++j) frutas[i][j] = new Fruta();
     }
     
     public int getMaxLin() {

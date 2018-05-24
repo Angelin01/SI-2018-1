@@ -18,7 +18,7 @@ import static comuns.PontosCardeais.acao;
  * @author tacla
  */
 public class Main {
-    private static int PARAMETRO_ESTAGNACAO = 100;
+    private static final int PARAMETRO_ESTAGNACAO = 100;
 
     public static void main(String args[]) throws IOException {
         // Cria o ambiente (modelo) = labirinto com suas paredes
@@ -68,7 +68,7 @@ public class Main {
             model.setPos(8, 0);
             ag.reset();
 
-            while (ag.deliberar() != -1); // O agente imprime o estado do mundo, conforme solicitado no enunciado do T04.
+            while (ag.deliberar() != -1);
 
             ++itCounter;
 
@@ -95,5 +95,18 @@ public class Main {
 
         System.out.println();
 
+        itCounter = 0;
+        do {
+            model.setPos(8, 0);
+            model.randomizeFrutas();
+            ag.reset();
+            ag.selectRandomSolution();
+
+            while (ag.followKnownSolution() != -1);
+
+            //double pontuacao = (ag.getEnergy()*(-1));
+
+            ++itCounter;
+        } while (itCounter < 100);
     }
 }

@@ -3,6 +3,7 @@ package sistema;
 import ambiente.Model;
 import arvore.TreeNode;
 import arvore.fnComparator;
+import comuns.Fruta;
 import problema.Estado;
 import problema.Problema;
 import comuns.PontosCardeais;
@@ -23,7 +24,9 @@ public class Agente implements PontosCardeais {
     String solucaoStr;
 
     List<List<Integer>> solucoesOtimas;
-    List<Integer> solucaoAtual;
+    private List<Integer> solucaoAtual;
+    private int actionIndex;
+    private double energy;
 
     private double custo;
 
@@ -194,6 +197,58 @@ public class Agente implements PontosCardeais {
         }
 
         return 1;
+    }
+
+    public void selectRandomSolution() {
+        solucaoAtual = solucoesOtimas.get(rng.nextInt(solucoesOtimas.size()));
+        actionIndex = 0;
+        energy = 3;
+    }
+
+    public int followKnownSolution() {
+        //System.out.println("Estou na posição " + estAtu.getString() + " com " + energy + " de energy.");
+
+        // Se o agente ainda tiver energy e ainda houver ações a executar no plano
+        if (energy >= 0 && actionIndex < solucaoAtual.size()) {
+            if (!prob.testeObjetivo(estAtu)) {
+                // Decide se come a fruta na posição atual ou não
+                if (rng.nextDouble() < 0.7f) {
+                    Fruta frutaPosAtual = model.getFrutaPos();
+                    energy += energia(frutaPosAtual.getCor());
+                    //System.out.println("Decidi comer a fruta na minha posição. Agora minha energy é " + energy + ".");
+                }
+                //else {
+                    //System.out.println("Decidi não comer a fruta na minha posição.");
+                //}
+            }
+
+            int action = solucaoAtual.get(actionIndex);
+            //System.out.println("Farei a ação " + acao[action]);
+
+            energy -= (action % 2 == 0) ? 1.0f : 1.5f;
+            executarIr(action);
+            estAtu = prob.suc(estAtu, action);
+
+            ++actionIndex;
+
+            //System.out.println("Agora estou na posição " + estAtu.getString() + " com " + energy + " de energy.\n");
+
+            return 1;
+        }
+
+        if (energy < 0) {
+            System.out.println("Morri. Pontuação: -100");
+            energy = 100;
+        }
+        else if (prob.testeObjetivo(estAtu)) {
+            System.out.println("Estou no objetivo. Pontuação: " + energy *(-1));
+        }
+
+        return -1;
+    }
+
+    public double getEnergy() {
+        return energy;
     }
     
     /**Funciona como um driver ou um atuador: envia o comando para

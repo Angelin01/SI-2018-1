@@ -1,4 +1,5 @@
 package ambiente;
+import comuns.Fruta;
 import comuns.PontosCardeais;
 import comuns.Labirinto;
 
@@ -106,6 +107,18 @@ public class Model implements PontosCardeais {
     public int[] lerPos() {
         return pos;
     }
+
+    /**Retorna a fruta na posição do agente
+     * @return referência a um objeto Fruta
+     */
+    public Fruta getFrutaPos() {
+        return labir.frutas[pos[0]][pos[1]];
+    }
+
+    public void randomizeFrutas() {
+        for (int i = 0; i < labir.getMaxLin(); ++i) for (int j = 0; j < labir.getMaxCol(); ++j) labir.frutas[i][j].randomize();
+    }
+
     /**Coloca o agente na posição solicitada pela ação ir, desde que seja
      * possível. Não pode ultrapassar os limites do labirinto nem estar em
      * uma posição ocupada por uma parede.
