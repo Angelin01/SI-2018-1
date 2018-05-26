@@ -17,33 +17,53 @@ import static java.lang.Math.*;
  * @author tacla
  */
 public class Agente implements PontosCardeais {
-    /* referência ao ambiente para poder atuar no mesmo*/
-    Model model;
-    Problema prob;
-    Estado estAtu; // guarda o estado atual (posição atual do agente)
-    String solucaoStr;
+    // Referência ao ambiente para poder atuar no mesmo
+    private Model model;
 
-    List<List<Integer>> solucoesOtimas;
-    private List<Integer> solucaoAtual;
-    private int actionIndex;
-    private double energy;
+    // Crença do agente sobre o problema
+    private Problema prob;
 
-    private double custo;
+    // Guarda o estado atual (posição atual do agente)
+    private Estado estAtu;
 
-    private double custoOtimo;
-    static int ct = -1;
-    int heuristica; /* Heurística inicial escolhida
-                    1 - Zero
-                    2 - Distância euclidiana
-                    3 - Distância Chebyshev */
+    // Seleciona a heurística inicial para o A* e o LRTA*
+    /* 1 - Zero
+     * 2 - Distância euclidiana
+     * 3 - Distância de Chebyshev (n de movimentos do rei do xadrez)
+     */
+    private int heuristica;
 
     // Valores de heurística para cada estado
-    float[][] heurEstados;
+    private float[][] heurEstados;
+
+    // Soluções ótimas encontradas pelo LRTA*
+    List<List<Integer>> solucoesOtimas;
+    private double custoOtimo;
+
+    // Variáveis para guardar a última solução computada pelo LRTA*
+    private List<Integer> solucaoAtual;
+    private String solucaoStr;
+    private double custo;
+
+    // Variável utilizada para seguir uma solução conhecida (armazena o índice da próxima ação a executar)
+    private int actionIndex;
+
+    // Armazena a energia atual do agente
+    private double energy;
+
+    // Contador de iterações
+    private static int ct = -1;
 
     // Gerador de números aleatórios para desempate
-    Random rng;
+    private Random rng;
 
+    /**
+     * Construtor único
+     * @param m Referência a um objeto do tipo Model, que representa o ambiente.
+     * @param heuristica 0, 1, ou 2. Indica qual heurística será usada pelo A* ou LRTA*.
+     */
     public Agente(Model m, int heuristica) {
+        // Inicializa a referência ao ambiente e as crenças do agente
         this.model = m;
         prob = new Problema();
         prob.criarLabirinto(9, 9);
@@ -58,19 +78,19 @@ public class Agente implements PontosCardeais {
         prob.crencaLabir.porParedeHorizontal(0, 0, 1);
         prob.crencaLabir.porParedeHorizontal(0, 1, 0);
         prob.crencaLabir.porParedeHorizontal(4, 7, 0);
-        
-        // Estado inicial, objetivo e atual
         prob.defEstIni(8, 0);
         prob.defEstObj(2, 6);
         this.estAtu = prob.estIni;
-        this.custo = 0;
 
-        this.heuristica = heuristica;
-
-        this.heurEstados = new float[prob.crencaLabir.getMaxLin()][prob.crencaLabir.getMaxCol()];
+        // Cria um gerador aleatório
         this.rng = new Random();
 
-        // Pré-inicializa a heurística em todas as posições
+        // Inicializa as variáveis usadas pelos algoritmos de busca
+        this.custo = 0;
+        this.heuristica = heuristica;
+
+        // Pré-inicializa a heurística em todas as posições da matriz do LRTA*
+        this.heurEstados = new float[prob.crencaLabir.getMaxLin()][prob.crencaLabir.getMaxCol()];
         for (int lin = 0; lin < prob.crencaLabir.getMaxLin(); lin++) {
             for (int col = 0; col < prob.crencaLabir.getMaxCol(); col++) {
                 if (heuristica == 1) {
@@ -85,26 +105,31 @@ public class Agente implements PontosCardeais {
             }
         }
 
-        solucaoStr = "";
+        // Variáveis utilizadas nas soluções computadas pelo LRTA*
         solucoesOtimas = new ArrayList<>();
         solucaoAtual = new ArrayList<>();
+        solucaoStr = "";
 
+        // Executa A* para determinar o custo ótimo
         custoOtimo = determinarCustoOtimo();
     }
     
-    /**Escolhe qual ação (UMA E SOMENTE UMA) será executada em um ciclo de raciocínio
-     * @return 1 enquanto o plano não acabar; -1 quando acabar
+    /**
+     * Escolhe qual ação (UMA E SOMENTE UMA) será executada em um ciclo de raciocínio.
+     * @param verbose Habilita ou desabilita prints.
+     * @return 1 enquanto o plano não acabar; -1 quando acabar.
      */
-
-    public int deliberar() {
+    public int deliberar(boolean verbose) {
         ++ct;
 
         // Imprime o estado do mundo
-        /*System.out.println("=============\n" +
-                "CT = " + ct + "\n");
-        model.desenhar();*/
+        if (verbose) {
+            System.out.println("=============\n" +
+                               "CT = " + ct + "\n");
+            model.desenhar();
 
-        //printHeur();
+            //printHeur();
+        }
 
         if (!prob.testeObjetivo(estAtu)) {
             float menorF = 0;
@@ -152,16 +177,17 @@ public class Agente implements PontosCardeais {
             // Escolhe a ação que leva a um vizinho aleatório com o menor f(n')
             int acaoAFazer = desempateAcoes.get((rng.nextInt(desempateAcoes.size())));
 
-            /*
-            System.out.println("Estado atual: (" + estAtu.getLin() + "," + estAtu.getCol() + ")");
-            System.out.println("Custo parcial: " + custo);
-            System.out.print("Acoes possiveis: ");
-            for (int i = 0; i < 8; i++) {
-                if (acoes[i] != -1) {
-                    System.out.print(acao[i] + " ");
+            if (verbose) {
+                System.out.println("Estado atual: (" + estAtu.getLin() + "," + estAtu.getCol() + ")");
+                System.out.println("Custo parcial: " + custo);
+                System.out.print("Acoes possiveis: ");
+                for (int i = 0; i < 8; i++) {
+                    if (acoes[i] != -1) {
+                        System.out.print(acao[i] + " ");
+                    }
                 }
+                System.out.println("\nProxima acao (escolhida): " + acao[acaoAFazer] + "\n");
             }
-            System.out.println("\nProxima acao (escolhida): " + acao[acaoAFazer] + "\n");*/
 
             custo += (acaoAFazer % 2 == 0) ? 1.0f : 1.5f;
             solucaoStr += " " + acao[acaoAFazer];
@@ -172,13 +198,15 @@ public class Agente implements PontosCardeais {
             estAtu = prob.suc(estAtu, acaoAFazer);
         }
         else {
-            /*System.out.println("Fim.");
-            System.out.println("Estado atual: (" + estAtu.getLin() + "," + estAtu.getCol() + ")");
-            System.out.println("Custo final: " + custo);
-            System.out.println("Razao de competitividade: " + custo + "/" + Double.toString(custoOtimo) + " = " + custo/custoOtimo);*/
+            if (verbose) {
+                System.out.println("Fim.");
+                System.out.println("Estado atual: (" + estAtu.getLin() + "," + estAtu.getCol() + ")");
+                System.out.println("Custo final: " + custo);
+                System.out.println("Razao de competitividade: " + custo + "/" + Double.toString(custoOtimo) + " = " + custo/custoOtimo);
+            }
 
             if(custo == custoOtimo) {
-                System.out.println("!!! Solucao otima encontrada !!!: " + solucaoStr);
+                if (verbose) System.out.println("!!! Solucao otima encontrada !!!: " + solucaoStr);
 
                 boolean newSolution = true;
                 for (List<Integer> list : solucoesOtimas) {
@@ -199,31 +227,52 @@ public class Agente implements PontosCardeais {
         return 1;
     }
 
+    /**
+     * Seleciona uma solução aleatória pré-gerada pelo LRTA* para seguir usando followKnownSolution.
+     */
     public void selectRandomSolution() {
         solucaoAtual = solucoesOtimas.get(rng.nextInt(solucoesOtimas.size()));
         actionIndex = 0;
         energy = 3;
     }
 
-    public int followKnownSolution() {
-        //System.out.println("Estou na posição " + estAtu.getString() + " com " + energy + " de energy.");
+    /**
+     * Seleciona uma solução aleatória pré-gerada pelo LRTA* para seguir usando followKnownSolution.
+     * @param eatRandomly Utiliza um lance aleatório para comer ou não frutas
+     * @param verbose Habilita ou desabilita prints
+     * @return 1 enquanto ainda houver ações a fazer; -1 quando acabar.
+     */
+    public int followKnownSolution(boolean eatRandomly, boolean verbose) {
+        if (verbose) System.out.println("Estou na posição " + estAtu.getString() + " com " + energy + " de energy.");
 
         // Se o agente ainda tiver energy e ainda houver ações a executar no plano
         if (energy >= 0 && actionIndex < solucaoAtual.size()) {
             if (!prob.testeObjetivo(estAtu)) {
                 // Decide se come a fruta na posição atual ou não
-                if (rng.nextDouble() < 0.7f) {
-                    Fruta frutaPosAtual = model.getFrutaPos();
-                    energy += energia(frutaPosAtual.getCor());
-                    //System.out.println("Decidi comer a fruta na minha posição. Agora minha energy é " + energy + ".");
+                if (eatRandomly) {
+                    if (randomFruitRoll()) {
+                        Fruta frutaPosAtual = model.getFrutaPos();
+                        energy += energia(frutaPosAtual.getCor());
+                        if (verbose) System.out.println("Decidi comer a fruta na minha posição. Agora minha energy é " + energy + ".");
+                    }
+                    else if (verbose) {
+                        System.out.println("Decidi não comer a fruta na minha posição.");
+                    }
                 }
-                //else {
-                    //System.out.println("Decidi não comer a fruta na minha posição.");
-                //}
+                else {
+                    Fruta frutaPosAtual = model.getFrutaPos();
+                    if (logicalFruitSelection(frutaPosAtual.getCor())) {
+                        energy += energia(frutaPosAtual.getCor());
+                        if (verbose) System.out.println("Decidi comer a fruta na minha posição. Agora minha energy é " + energy + ".");
+                    }
+                    else if (verbose) {
+                        System.out.println("Decidi não comer a fruta na minha posição.");
+                    }
+                }
             }
 
             int action = solucaoAtual.get(actionIndex);
-            //System.out.println("Farei a ação " + acao[action]);
+            if (verbose) System.out.println("Farei a ação " + acao[action]);
 
             energy -= (action % 2 == 0) ? 1.0f : 1.5f;
             executarIr(action);
@@ -231,27 +280,71 @@ public class Agente implements PontosCardeais {
 
             ++actionIndex;
 
-            //System.out.println("Agora estou na posição " + estAtu.getString() + " com " + energy + " de energy.\n");
+            if (verbose) System.out.println("Agora estou na posição " + estAtu.getString() + " com " + energy + " de energy.\n");
 
             return 1;
         }
 
         if (energy < 0) {
-            System.out.println("Morri. Pontuação: -100");
+            if (verbose) System.out.println("Morri. Pontuação: -100");
             energy = 100;
         }
-        else if (prob.testeObjetivo(estAtu)) {
+        else if (verbose && prob.testeObjetivo(estAtu)) {
             System.out.println("Estou no objetivo. Pontuação: " + energy *(-1));
         }
 
         return -1;
     }
 
+    /**
+     * Retorna a quantidade de energia que o agente possui no momento
+     * @return Quantidade de energia que o agente possui nesse momento
+     */
     public double getEnergy() {
         return energy;
     }
+
+    /**
+     * Faz um lance aleatório para decidir se come uma fruta ou não, de acordo com uma porcentagem definida.
+     * @return true, se a fruta deve ser comida; false, caso contrário.
+     */
+    private boolean randomFruitRoll() {
+        return (rng.nextDouble() < 0.7f);
+    }
+
+    /**
+     * Decide se come ou não uma fruta com base em suas cores.
+     * @param cor Vetor de 5 posições contendo as cores da fruta.
+     * @return true, se a fruta deve ser comida; false, caso contrário.
+     */
+    private boolean logicalFruitSelection(char[] cor) {
+        // Check de entrada de tamanho inválido
+        if (cor.length != 5) {
+            return false;
+        }
+
+        // Valor de energia fornecido pela fruta
+        int fruitEnergy = energia(cor);
+
+        // Quantidade de energia atual
+        // energy
+
+        // Quanto estima gastar
+        float energyNeeded = 0;
+        for (int i = actionIndex; i < solucaoAtual.size(); ++i) {
+            if (solucaoAtual.get(i) % 2 == 0) {
+                energyNeeded += 1.0f;
+            }
+            else {
+                energyNeeded += 1.5f;
+            }
+        }
+
+        return (fruitEnergy != 0 && energy < energyNeeded && (energy + fruitEnergy) < (energyNeeded + 2));
+    }
     
-    /**Funciona como um driver ou um atuador: envia o comando para
+    /**
+     * Funciona como um driver ou um atuador: envia o comando para
      * agente físico ou simulado (no nosso caso, simulado)
      * @param direcao N NE S SE ...
      * @return 1 se ok ou -1 se falha
@@ -259,15 +352,22 @@ public class Agente implements PontosCardeais {
     public int executarIr(int direcao) {
         model.ir(direcao);
         return 1; 
-    }   
-    
-    // Sensor
+    }
+
+    /**
+     * Retorna a posição atual do agente em formato de objeto Estado.
+     * @return objeto do tipo Estado contendo as coordenadas do agente.
+     */
     public Estado sensorPosicao() {
         int pos[];
         pos = model.lerPos();
         return new Estado(pos[0], pos[1]);
     }
 
+    /**
+     * Executa o algoritmo A* para determinar o custo ótimo até o objetivo.
+     * @return valor do menor custo de caminho do estado inicial até o objetivo.
+     */
     private float determinarCustoOtimo() {
         // Cria a raiz da árvore
         TreeNode noInicial = new TreeNode(null);
@@ -355,10 +455,28 @@ public class Agente implements PontosCardeais {
         }
     }
 
+    /**
+     * Retorna sempre zero.
+     * Independe dos parâmetros: eles estão aí somente porque tínhamos pensado
+     * em fazer algo como C++, e passar a função de heurística escolhida
+     * como parâmetro. Aí precisaríamos que todas as funções de heurística
+     * tivessem a mesma assinatura.
+     * Mas não conseguimos fazer isso em Java.
+     * @return 0.0f sempre.
+     */
     private float heurZero(int lin, int col) {
         return 0.0f;
     }
 
+    /**
+     * Retorna a distância euclidiana entre uma posição qualquer e a posição
+     * do objetivo.
+     * A distância euclidiana é a distância em linha reta, calculada pelo
+     * Teorema de Pitágoras.
+     * @param lin Coordenada Y
+     * @param col Coordenada X
+     * @return Distância euclidiana entre o ponto e o objetivo.
+     */
     private float heurEuclidiana(int lin, int col) {
         return (float) sqrt(
                 (prob.estObj.getLin() - lin) * (prob.estObj.getLin() - lin) +
@@ -366,6 +484,17 @@ public class Agente implements PontosCardeais {
         );
     }
 
+    /**
+     * Retorna a distância de Chebyshev entre uma posição qualquer e a posição
+     * do objetivo.
+     * A distância de Chebyshev é o menor número de movimentos do Rei do xadrez
+     * que o levam do primeiro ponto ao segundo ponto.
+     * Em outras palavras, é o maior número entre a distância entre linhas e a
+     * distância entre colunas.
+     * @param lin Coordenada Y
+     * @param col Coordenada X
+     * @return Distância euclidiana entre o ponto e o objetivo.
+     */
     private float heurChebyshev(int lin, int col) {
         return (float) max(
                 abs(prob.estObj.getLin() - lin),
@@ -373,14 +502,26 @@ public class Agente implements PontosCardeais {
         );
     }
 
+    /**
+     * Retorna o custo da solução atual.
+     * @return custo da solução atual.
+     */
     public double getCusto() {
         return custo;
     }
 
+    /**
+     * Retorna o custo da solução ótima.
+     * @return custo da solução ótima.
+     */
     public double getCustoOtimo() {
         return custoOtimo;
     }
 
+    /**
+     * Reinicia o agente, para que seja possível fazer uma nova execução
+     * sem criar uma nova instância.
+     */
     public void reset() {
         custo = 0;
         ct = -1;
@@ -389,6 +530,9 @@ public class Agente implements PontosCardeais {
         solucaoAtual = new ArrayList<>();
     }
 
+    /**
+     * Mostra a matriz de heurísticas na saída padrão.
+     */
     public void printHeur() {
         // Pré-inicializa a heurística em todas as posições
         for (int lin = 0; lin < prob.crencaLabir.getMaxLin(); lin++) {
@@ -409,6 +553,13 @@ public class Agente implements PontosCardeais {
         System.out.println("+");
     }
 
+    /**
+     * Determina a energia de uma fruta, com base em suas características de cor.
+     * A lógica dessa função é baseada na árvore de decisão gerada pelo algoritmo
+     * ID3, com base no dataset fornecido.
+     * @param cor Vetor de 5 posições contendo as características de cor
+     * @return Energia da fruta.
+     */
     private int energia(char[] cor) {
         // Check de entrada de tamanho inválido
         if (cor.length != 5) {

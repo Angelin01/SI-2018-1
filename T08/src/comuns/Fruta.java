@@ -4,16 +4,11 @@ import java.util.Random;
 
 public class Fruta {
     private char[] cor;
-    private int energia;
 
     private static final Random rng = new Random();
 
     public char[] getCor() {
         return cor;
-    }
-
-    public int getEnergia() {
-        return energia;
     }
 
     public Fruta() {
@@ -22,8 +17,6 @@ public class Fruta {
     }
 
     public void randomize() {
-        energia = rng.nextInt(3) * 2;
-
         for (int i = 0; i < 5; i++) {
             if (i == 0 || i == 4) {
                 if (rng.nextInt(2) == 0) {

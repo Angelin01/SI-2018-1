@@ -68,7 +68,7 @@ public class Main {
             model.setPos(8, 0);
             ag.reset();
 
-            while (ag.deliberar() != -1);
+            while (ag.deliberar(false) != -1);
 
             ++itCounter;
 
@@ -93,7 +93,7 @@ public class Main {
             System.out.println();
         }
 
-        System.out.println();
+        System.out.println("\nIniciando execuções com seleção aleatória de frutas:\n");
 
         itCounter = 0;
         do {
@@ -102,9 +102,29 @@ public class Main {
             ag.reset();
             ag.selectRandomSolution();
 
-            while (ag.followKnownSolution() != -1);
+            System.out.print(itCounter+1 + ": ");
+            while (ag.followKnownSolution(true, false) != -1);
 
-            //double pontuacao = (ag.getEnergy()*(-1));
+            double pontuacao = (ag.getEnergy()*(-1));
+            System.out.println("Pontuação = " + pontuacao);
+
+            ++itCounter;
+        } while (itCounter < 100);
+
+        System.out.println("\nIniciando execuções com seleção lógica de frutas:\n");
+
+        itCounter = 0;
+        do {
+            model.setPos(8, 0);
+            model.randomizeFrutas();
+            ag.reset();
+            ag.selectRandomSolution();
+
+            System.out.print(itCounter+1 + ": ");
+            while (ag.followKnownSolution(false, false) != -1);
+
+            double pontuacao = (ag.getEnergy()*(-1));
+            System.out.println("Pontuação = " + pontuacao);
 
             ++itCounter;
         } while (itCounter < 100);
