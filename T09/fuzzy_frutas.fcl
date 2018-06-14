@@ -1,0 +1,56 @@
+FUNCTION_BLOCK fuzzy_frutas
+
+	VAR_INPUT
+		energia_atual : REAL;
+		energia_fruta : REAL;
+		estima_gastar : REAL;
+	END_VAR
+
+	VAR_OUTPUT
+		deseja_comer : REAL;
+	END_VAR
+
+	FUZZIFY energia_atual
+		TERM baixa := (0, 1) (1, 1) (3, 0);
+		TERM media := (0, 0) (1, 0) (3, 1) (4, 1) (6, 0);
+		TERM alta  := (0, 0) (4, 0) (6, 1);
+	END_FUZZIFY
+
+	FUZZIFY energia_fruta
+		TERM baixa := (0, 1) (0.5, 1) (1.5, 0);
+		TERM media := (0, 0) (0.5, 0) (1.5, 1) (2.5, 1) (3.5, 0);
+		TERM alta  := (0, 0) (2.5, 0) (3.5, 1);
+	END_FUZZIFY
+
+	FUZZIFY estima_gastar
+		TERM pouco := (0, 1) (3, 1) (5, 0);
+		TERM medio := (0, 0) (3, 0) (5, 1) (7, 1) (10, 0);
+		TERM muito := (0, 0) (7, 0) (10, 1);
+	END_FUZZIFY
+
+	DEFUZZIFY deseja_comer
+		TERM nope  := (0, 0) (0.15, 1) (0.3, 0);
+		TERM maybe := (0.4, 0) (0.55, 1) (0.7, 0);
+		TERM yup   := (0.8, 0) (0.9, 1) (1, 0);
+		METHOD : COG;
+		DEFAULT := 0;
+	END_DEFUZZIFY
+
+	RULEBLOCK No1
+		AND  : MIN;
+		ACT  : MIN;
+		ACCU : MAX;
+		
+		RULE 1  : IF energia_atual IS alta THEN deseja_comer IS nope;
+		RULE 2  : IF energia_fruta IS baixa THEN deseja_comer IS nope;
+		RULE 3  : IF energia_fruta IS media AND energia_atual IS baixa THEN deseja_comer IS yup;
+		RULE 4  : IF energia_fruta IS media AND energia_atual IS media AND estima_gastar IS pouco THEN deseja_comer IS nope;
+		RULE 5  : IF energia_fruta IS media AND energia_atual IS media AND estima_gastar IS medio THEN deseja_comer IS maybe;
+		RULE 6  : IF energia_fruta IS media AND energia_atual IS media AND estima_gastar IS muito THEN deseja_comer IS yup;
+		RULE 7  : IF energia_fruta IS alta  AND energia_atual IS baixa THEN deseja_comer IS maybe;
+		RULE 8  : IF energia_fruta IS alta  AND energia_atual IS media AND estima_gastar IS pouco THEN deseja_comer IS nope;
+		RULE 9  : IF energia_fruta IS alta  AND energia_atual IS media AND estima_gastar IS medio THEN deseja_comer IS nope;
+		RULE 10 : IF energia_fruta IS alta  AND energia_atual IS media AND estima_gastar IS muito THEN deseja_comer IS maybe;
+	END_RULEBLOCK
+
+END_FUNCTION_BLOCK
